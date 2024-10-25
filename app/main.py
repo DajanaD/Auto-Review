@@ -1,20 +1,20 @@
 from fastapi import FastAPI
-from aioredis import create_redis_pool
+from redis.asyncio import Redis
+import uvicorn
+from app.routes.review import router as routes_review
 
 app = FastAPI()
+redis = Redis(host="localhost", port=6379, decode_responses=True)
 
-# Event to initialize Redis
 @app.on_event("startup")
 async def startup_event():
-    global redis
-    redis = await create_redis_pool("redis://localhost")
+    await redis.ping()
 
-# Event to close Redis connection
 @app.on_event("shutdown")
 async def shutdown_event():
-    redis.close()
-    await redis.wait_closed()
+    await redis.close()
 
-# Include routes from review
-from app.routes.review import router as review_router
-app.include_router(review_router)
+app.include_router(routes_review.router, prefix="/api")
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

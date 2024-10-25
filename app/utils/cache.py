@@ -1,15 +1,7 @@
-from aioredis import Redis
+from app.main import redis
 
-redis = Redis()
-
-async def cache_repo_content(key: str, repo_content: str, expiration: int = 3600):
-    """
-    Cache the repository content with a specified expiration time.
-    """
-    await redis.set(key, repo_content, expire=expiration)
+async def cache_repo_content(key: str, value: dict, expiration: int = 3600):
+    await redis.set(key, value, ex=expiration)
 
 async def get_cached_content(key: str):
-    """
-    Retrieve cached content from Redis.
-    """
     return await redis.get(key)
