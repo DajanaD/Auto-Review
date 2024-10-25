@@ -1,33 +1,17 @@
+version: "3.9"
+
 services:
   web:
-    build:
-      context: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    volumes:
-      - .:/app
+    build: .
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
     environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - POSTGRES_PORT
-      - POSTGRES_HOST
-    env_file:
-      - .env
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
 
-  postgres:
-    image: postgres:16
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+  redis:
+    image: redis:alpine
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - .env
-
-volumes:
-  postgres_data:
