@@ -1,20 +1,26 @@
 from fastapi import FastAPI
 from redis.asyncio import Redis
-import uvicorn
-from app.routes.review import router as routes_review
+from app.routes import review
 
 app = FastAPI()
 redis = Redis(host="localhost", port=6379, decode_responses=True)
 
 @app.on_event("startup")
 async def startup_event():
-    await redis.ping()
+    # Проверка соединения с Redis
+    try:
+        await redis.ping()
+        print("Successfully connected to Redis.")
+    except Exception as e:
+        print(f"Error connecting to Redis: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     await redis.close()
 
-app.include_router(routes_review.router, prefix="/api")
+# Включение маршрутов
+app.include_router(review.router, prefix="/api")
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

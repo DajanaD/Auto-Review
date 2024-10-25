@@ -7,14 +7,14 @@ class GitHubRepoRequest(BaseModel):
 class GitHubRepoResponse(BaseModel):
     files: List[Dict[str, str]]
     directories: List[Dict[str, str]]
-    # app/models/models.py
+   
 
 class RepoContent(BaseModel):
-    type: str  # Тип элемента, например, 'file' или 'dir'
-    name: str  # Название файла или папки
-    path: str  # Путь до элемента
-    content: str = None  # Содержимое файла, если есть
-    url: str  # URL для доступа к содержимому
+    type: str  
+    name: str 
+    path: str  
+    content: str = None 
+    url: str 
 
 
 class AnalyzeRequest(BaseModel):
@@ -27,3 +27,4 @@ class AnalyzeResponse(BaseModel):
     issues: List[str]
     rating: str
     conclusion: str
+
