@@ -1,31 +1,22 @@
-from app.main import redis
+from app.utils.redis_client import redis  # Імпортуємо Redis із redis_client
 
 async def cache_repo_content(key: str, value: dict, expiration: int = 3600):
     """
     Caches the repository content in Redis.
-
-    Parameters:
-    - key (str): The Redis key to store the content under, typically including the repository URL for uniqueness.
-    - value (dict): The content to cache, structured as a dictionary (often a serialized JSON format).
-    - expiration (int): The expiration time for the cached data in seconds (default is 3600 seconds or 1 hour).
-
-    Description:
-    Stores the repository content in Redis using the specified key and sets an expiration time. 
-    Once cached, this content can be quickly retrieved to avoid redundant GitHub API calls.
-
-    Returns:
-    - None: This function only sets a key in Redis without returning any value.
     """
-    await redis.set(key, value, ex=expiration)  # Store content in Redis with the specified expiration time
+    try:
+        await redis.set(key, value, ex=expiration)
+    except Exception as e:
+        print(f"Error caching data in Redis: {e}")
 
 async def get_cached_content(key: str):
     """
     Retrieves cached repository content from Redis.
-
-    Parameters:
-    - key (str): The Redis key to look up the cached content.
-
-    Returns:
-    - The cached content associated with the key if it exists, or None if there is no data cached for the key.
     """
-    return await redis.get(key)  # Fetch cached content by key, or return None if not present
+    try:
+        cached_value = await redis.get(key)
+        if cached_value:
+            return cached_value
+    except Exception as e:
+        print(f"Error retrieving data from Redis: {e}")
+    return None

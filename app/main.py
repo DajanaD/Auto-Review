@@ -1,13 +1,11 @@
 from fastapi import FastAPI
-from redis.asyncio import Redis
 from app.routes import review
+from app.utils.redis_client import redis  # Імпортуємо Redis із redis_client
 
 app = FastAPI()
-redis = Redis(host="localhost", port=6379, decode_responses=True)
 
 @app.on_event("startup")
 async def startup_event():
-    # Проверка соединения с Redis
     try:
         await redis.ping()
         print("Successfully connected to Redis.")
@@ -18,7 +16,6 @@ async def startup_event():
 async def shutdown_event():
     await redis.close()
 
-# Включение маршрутов
 app.include_router(review.router, prefix="/api")
 
 if __name__ == "__main__":
